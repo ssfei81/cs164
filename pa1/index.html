@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<head>
+<meta charset="utf-8">
+<title>CS164: pa1</title>
+<script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+<script src="http://underscorejs.org/underscore-min.js"></script>
+
+<style>
+.axis path,
+.axis line {
+    fill:none;
+    stroke:black;
+    shape-rendering: crispEdges;
+}
+
+.axis text{
+    font-family: verdana;
+    font-size: 10pt;
+}
+</style>
+</head>
+
+<body>
+<div id="plot"></div>
+<select id="paradigmSelect"></select>
+<br>
+<br>
+Show Influence(Extra Credit)
+
+<script>
+var xScale;
+var yScale;
+svgHeight = 550;
+svgWidth = 1000;
+marginTop = 40;
+marginBottom = 35;
+marginLeft = 60;
+marginRight = 100;
+
+//create svg element
+var svg = d3.select("#plot")
+.append("svg")
+.attr("width", svgWidth)
+.attr("height", svgHeight);
+
+//append grps for axis
+svg.append("g").attr("id", "xAxis")
+svg.append("g").attr("id", "yAxis");
+svg.append("text")
+    .text("Year")
+    .attr("x", svgWidth-marginRight-20)
+    .attr("y", svgHeight)
+    .attr("fill", "black")
+    .attr("font-size", "8pt")
+    .attr("font-family", "verdana")
+    .attr("font-weight", "bold");
+    
+svg.append("text")
+.text("#Repos")
+.attr("x", -80)
+.attr("y", 80)
+.attr("transform", "rotate(270)")
+.attr("fill", "black")
+.attr("font-size", "8pt")
+.attr("font-family", "verdana")
+.attr("font-weight", "bold");
+    
+//get json data
+var langdataGlobal;
+var curdata;
+
+d3.json("http://localhost:8888/data.json", function(error, langdata){
+        langdataGlobal = langdata;
+        init(langdata);
+        });
+
+//event listener for the select box
+var paradigm;
+function paradigmSelectListener()
+    {
+    paradigm = this.options[this.selectedIndex].value;
+    var filteredData = _.filter(curdata, filterByParadigm);
+    
+    rescale(filteredData);
+    drawScatterPlot(filteredData);
+    }
+
+//filter functions
+function filterByParadigm(language)
+    {
+    if(_.contains(language["paradigms"], paradigm)) return true;
+    else return false;
+    }
+
+//attach listener to select box
+d3.select("#paradigmSelect").on("change",paradigmSelectListener);
+
+//rescale the plot
+function rescale(d)
+    {
+    //define a linear scale in between minYear and maxYear
+    minYear = d3.min(d, function(d) {return d["year"]})-1;
+    maxYear = d3.max(d, function(d) {return d["year"]})+1;
+    
+    xScale = d3.scale.linear()
+    .domain([minYear, maxYear])
+    .range([marginLeft, svgWidth-marginRight]);
+    
+    //define a log scale in between minNbRepos and maxNbRepos
+    minNbRepos = d3.min(d, function(d) {return d["nbRepos"]})-10;
+    maxNbRepos = d3.max(d, function(d) {return d["nbRepos"]})+10;
+    
+    yScale = d3.scale.log()
+    .domain([minNbRepos, maxNbRepos])
+    .range([svgHeight-marginBottom, marginTop]);
+    }
+
+//initialize the program
+function init(d)
+    {
+    rescale(d);
+
+    //get paradigms
+    tmp = _.map(d, function(lang) {
+          return lang["paradigms"];
+          });
+          
+    allParadigms = _.uniq(_.flatten(tmp));
+
+    d3.select("#paradigmSelect")
+    .selectAll("option")
+    .data(allParadigms)
+    .enter()
+    .append("option")
+    .text(function(d) {return d});
+    
+    curdata = d;
+    drawScatterPlot(d);
+    }
+
+function getKey(d)
+    {
+    return d["name"];
+    }
+
+//draw scatter plot
+function drawScatterPlot(d)
+    {
+    //remove circle and text
+    svg.selectAll("circle").data(d, getKey).exit()
+    .transition().duration(500).style("opacity", 0).remove();
+    svg.selectAll("#circlelabel").data(d, getKey).exit()
+    .transition().duration(500).style("opacity", 0).remove();
+
+    //update circles
+    svg.selectAll("circle")
+    .data(d, getKey)
+    .style("opacity", 1)
+    .transition()
+    .delay(500)
+    .duration(500)
+    .attr("r", 5)
+    .attr("cx", function(d) {
+          return xScale(d["year"]);
+          })
+    .attr("cy", function(d) {
+          return yScale(d["nbRepos"]);
+          })
+          ;
+    svg.selectAll("#circlelabel")
+    .data(d, getKey)
+    .style("opacity", 1)
+    .transition()
+    .delay(500)
+    .duration(500)
+    .text(function(d){
+          return d["name"];
+          })
+    .attr("x", function(d) {
+          return xScale(d["year"])+5;
+          })
+    .attr("y", function(d) {
+          return yScale(d["nbRepos"]) - 5;
+          });
+          
+      //create circles
+    svg.selectAll("circle")
+    .data(d, getKey)
+    .enter()
+    .append("circle")
+    .attr("r", 5)
+    .attr("cx", function(d) {
+          return xScale(d["year"]);
+          })
+    .attr("cy", function(d) {
+        return yScale(d["nbRepos"]);
+        })
+    .attr("fill", "yellow")
+    .attr("stroke", "black")
+    .attr("stroke-width", 2.5)
+    .style("opacity", 0)
+    .transition().delay(1000).duration(500).style("opacity", 1);
+          
+    //append label to circles
+    svg.selectAll("#circlelabel")
+    .data(d, getKey)
+    .enter()
+    .append("text")
+    .attr("id", "circlelabel")
+    .text(function(d){
+          return d["name"];
+          })
+    .attr("x", function(d) {
+          return xScale(d["year"])+5;
+          })
+    .attr("y", function(d) {
+          return yScale(d["nbRepos"]) - 5;
+          })
+    .attr("fill", "red")
+    .attr("font-size", "9pt")
+    .attr("font-family", "verdana")
+    .style("opacity", 0)
+    .transition().delay(1000).duration(500).style("opacity", 1);
+    
+    paddingBottom = 35;
+    paddingLeft = 60;
+    //display x axis
+    xAxis = d3.svg.axis()
+    .scale(xScale)
+    .orient("bottom");
+    
+    svg.select("#xAxis")
+    .attr("class", "axis")
+    .attr("transform", "translate(0," + (svgHeight-paddingBottom) + ")")
+    .transition()
+    .delay(500)
+    .duration(500)
+    .call(xAxis);
+                
+    //display y axis
+    yAxis = d3.svg.axis()
+    .scale(yScale)
+    .orient("left");
+    
+    svg.select("#yAxis")
+    .attr("class", "axis")
+    .attr("transform", "translate("+ paddingLeft+", 0)")
+    .transition()
+    .delay(500)
+    .duration(500)
+    .call(yAxis);
+    }
+
+</script>
+</body>
+</html>
