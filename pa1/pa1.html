@@ -26,16 +26,18 @@
 <br>
 <br>
 Show Influence(Extra Credit)
+<input type="checkbox" id="checkbox">
 
 <script>
 var xScale;
 var yScale;
-svgHeight = 550;
-svgWidth = 1000;
-marginTop = 40;
-marginBottom = 35;
-marginLeft = 60;
-marginRight = 100;
+var svgHeight = 550;
+var svgWidth = 1000;
+var marginTop = 40;
+var marginBottom = 35;
+var marginLeft = 60;
+var marginRight = 100;
+var delay = 0;
 
 //create svg element
 var svg = d3.select("#plot")
@@ -47,13 +49,13 @@ var svg = d3.select("#plot")
 svg.append("g").attr("id", "xAxis")
 svg.append("g").attr("id", "yAxis");
 svg.append("text")
-    .text("Year")
-    .attr("x", svgWidth-marginRight-20)
-    .attr("y", svgHeight)
-    .attr("fill", "black")
-    .attr("font-size", "8pt")
-    .attr("font-family", "verdana")
-    .attr("font-weight", "bold");
+.text("Year")
+.attr("x", svgWidth-marginRight-20)
+.attr("y", svgHeight)
+.attr("fill", "black")
+.attr("font-size", "8pt")
+.attr("font-family", "verdana")
+.attr("font-weight", "bold");
     
 svg.append("text")
 .text("#Repos")
@@ -64,27 +66,40 @@ svg.append("text")
 .attr("font-size", "8pt")
 .attr("font-family", "verdana")
 .attr("font-weight", "bold");
-    
+
+//arrwo head
+svg.append("defs").append("marker")
+.attr("id", "arrowhead")
+.attr("refX", 6)
+.attr("refY", 2)
+.attr("markerWidth", 6)
+.attr("markerHeight", 4)
+.attr("orient", "auto")
+.append("path")
+.attr("d", "M 0,0 V 4 L6,2 Z");
+
 //get json data
 var langdataGlobal;
 var curdata;
 
 d3.json("http://localhost:8888/data.json", function(error, langdata){
-        langdataGlobal = langdata;
-        init(langdata);
-        });
+    langdataGlobal = langdata;
+    init(langdata);
+    });
 
 //event listener for the select box
 var paradigm;
 function paradigmSelectListener()
     {
     paradigm = this.options[this.selectedIndex].value;
-    var filteredData = _.filter(curdata, filterByParadigm);
+    var filteredData = _.filter(langdataGlobal, filterByParadigm);
     
+    //set delay to 500 for animation
+    delay = 500;
     rescale(filteredData);
     drawScatterPlot(filteredData);
+    curdata = filteredData;
     }
-
 //filter functions
 function filterByParadigm(language)
     {
@@ -92,8 +107,20 @@ function filterByParadigm(language)
     else return false;
     }
 
-//attach listener to select box
+var showInfluence = false;
+function checkboxListener()
+    {
+    showInfluence = this.checked;
+    //remove delay when turning on the lines
+    delay = 0;
+    drawScatterPlot(curdata);
+    }
+
+//attach listener to check box
 d3.select("#paradigmSelect").on("change",paradigmSelectListener);
+
+//attach listener to select box
+d3.select("#checkbox").on("change",checkboxListener);
 
 //rescale the plot
 function rescale(d)
@@ -148,17 +175,20 @@ function drawScatterPlot(d)
     {
     //remove circle and text
     svg.selectAll("circle").data(d, getKey).exit()
-    .transition().duration(500).style("opacity", 0).remove();
+    .transition().duration(delay).style("opacity", 0).remove();
     svg.selectAll("#circlelabel").data(d, getKey).exit()
-    .transition().duration(500).style("opacity", 0).remove();
+    .transition().duration(delay).style("opacity", 0).remove();
+    
+    //remove all lines
+    svg.selectAll("line").remove();
 
     //update circles
     svg.selectAll("circle")
     .data(d, getKey)
     .style("opacity", 1)
     .transition()
-    .delay(500)
-    .duration(500)
+    .delay(delay)
+    .duration(delay)
     .attr("r", 5)
     .attr("cx", function(d) {
           return xScale(d["year"]);
@@ -171,8 +201,8 @@ function drawScatterPlot(d)
     .data(d, getKey)
     .style("opacity", 1)
     .transition()
-    .delay(500)
-    .duration(500)
+    .delay(delay)
+    .duration(delay)
     .text(function(d){
           return d["name"];
           })
@@ -199,7 +229,7 @@ function drawScatterPlot(d)
     .attr("stroke", "black")
     .attr("stroke-width", 2.5)
     .style("opacity", 0)
-    .transition().delay(1000).duration(500).style("opacity", 1);
+    .transition().delay(delay*2).duration(delay).style("opacity", 1);
           
     //append label to circles
     svg.selectAll("#circlelabel")
@@ -220,7 +250,7 @@ function drawScatterPlot(d)
     .attr("font-size", "9pt")
     .attr("font-family", "verdana")
     .style("opacity", 0)
-    .transition().delay(1000).duration(500).style("opacity", 1);
+    .transition().delay(delay*2).duration(delay).style("opacity", 1);
     
     paddingBottom = 35;
     paddingLeft = 60;
@@ -233,8 +263,8 @@ function drawScatterPlot(d)
     .attr("class", "axis")
     .attr("transform", "translate(0," + (svgHeight-paddingBottom) + ")")
     .transition()
-    .delay(500)
-    .duration(500)
+    .delay(delay)
+    .duration(delay)
     .call(xAxis);
                 
     //display y axis
@@ -246,9 +276,40 @@ function drawScatterPlot(d)
     .attr("class", "axis")
     .attr("transform", "translate("+ paddingLeft+", 0)")
     .transition()
-    .delay(500)
-    .duration(500)
+    .delay(delay)
+    .duration(delay)
     .call(yAxis);
+    
+    
+    /**************
+    *Extra Credit*
+    **************/
+    if(showInfluence)
+        {
+        for (x = 0; x < d.length; x++)
+            {
+            for(y = 0; y < d.length; y++)
+                {
+                if(d[x]["name"] != d[y]["name"])
+                    {
+                    found = d[x]["influenced"].indexOf(d[y]["name"])
+                    if(found != -1)
+                        {
+                        svg.append("line")
+                        .attr("x1", xScale(d[x]["year"]))
+                        .attr("y1", yScale(d[x]["nbRepos"]))
+                        .attr("x2", xScale(d[y]["year"]))
+                        .attr("y2", yScale(d[y]["nbRepos"]))
+                        .attr("stroke-width", 2)
+                        .attr("stroke", "black")
+                        .attr("marker-end", "url(#arrowhead)")
+                        .style("opacity", 0);
+                        }
+                    }
+                }
+            }
+            svg.selectAll("line").transition().delay(delay*2).duration(delay).style("opacity", 1);
+        }
     }
 
 </script>
