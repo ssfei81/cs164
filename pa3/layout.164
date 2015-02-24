@@ -1,0 +1,10 @@
+##
+# The main layout function that drives the multi-pass layout algorithm.
+#
+
+def layout(root) {
+  root:visitInPostorder(lambda(box){box:pass1_ComputeWeightAndColor()})
+  # TODO: write the remaining passes
+  root:visitInPreorder(lambda(box){box:pass2()})
+  root:visitInPreorder(lambda(box){box:pass3_Render()})
+}

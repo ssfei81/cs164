@@ -1,0 +1,61 @@
+def newList() {
+	def length = 0
+	def list = lambda(s) {}
+	def append(item) {
+	  length = length + 1
+	  def l = list
+	  list = lambda(s) {
+	      if(s == "first") {
+	        item
+	      } else {
+	        l
+	      }
+	  } 
+	}
+	def to_s() {
+	  list
+	}
+	def clear() {
+	  list = lambda(s) {}
+	  length = 0
+	}
+	lambda(func) {
+	  if(func == "to_s") {
+	    to_s()
+	  } else {
+	    if(func == "prepend") {
+	      lambda(item) {
+	        append(item)
+	      }   
+	    } else {
+	      if(func == "length") {
+	        length
+	      } else {
+	        if(func == "clear") {
+	          clear()
+	        } else {
+	          if(func == "get") {
+	            lambda(s) {
+	              list(s)	            
+	            }	          
+	          }
+	        }
+	      }
+	    }
+	  }
+	}
+}
+
+def list = newList()
+list("prepend")(4)
+list("prepend")("f")
+list("prepend")("foo")
+list("prepend")("Getting to 35 points is a huge f&#*ing challenge!")
+print list("get")("first")
+print list("get")("rest")("first")
+print list("get")("rest")("rest")("first")
+print list("get")("rest")("rest")("rest")("first")
+print "My list has " + list("length") + ' items in it!'
+list("clear")
+print list("get")("first")
+print "My list has " + list("length") + ' items in it!'

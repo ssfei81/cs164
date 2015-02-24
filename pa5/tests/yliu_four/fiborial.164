@@ -1,0 +1,50 @@
+def fibo = lambda (val) {
+	if(val <= 2){
+		1
+	} else{
+		def x = fibo(val-1) + fibo(val-2)
+		x
+	}
+}
+
+def fact = lambda (z) {
+	def f = 0
+	if (z == 1) {
+		f = 1
+	} else {
+		f = fact(z - 1)
+	}
+	def a = z * f
+	a
+}
+
+def fiborial = lambda (f1, f2, V) {
+	def x = f1(V) + f2(V)
+	def y = f1(V) - f2(V)
+	def z = f1(V) * f2(V)
+	def alpha = f1(V) / f2(V)
+	print x
+	print y
+	print z
+	print alpha
+}
+
+def iter = lambda(z) {
+	def i = 0;
+	lambda () {
+		if (i < z){
+			i = i + 1
+			i
+		}
+		else {
+			null
+		}
+	}
+}
+
+for (x in iter(5)) {
+	fiborial(fibo, fact, x)
+}
+for (y in iter(5)) {
+	fiborial(fact, fibo, y)
+}

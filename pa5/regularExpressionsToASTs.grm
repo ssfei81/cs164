@@ -1,0 +1,12 @@
+%ignore /\n+/
+
+%%
+
+R ->  CHAR               %{ var uid = genUID(); return n1.val + uid + '\n' + n1.val + uid + ' [label="' + n1.val + '"]'; %}
+  | R R        %dprec 2  %{ var uid = genUID(); return 'c' + uid + ' -> ' + n1.val + '\nc' + uid + ' -> ' + n2.val + '\nc' + uid + ' [label="."]'; %}
+  | R '|' R    %dprec 3  %{ var uid = genUID(); return 'a' + uid + ' -> ' + n1.val + '\na' + uid + ' -> ' + n3.val + '\na' + uid + ' [label="|"]'; %}
+  | '(' R ')'            %{ return n2.val; %}
+  | R '*'	   %dprec 1	 %{ var uid = genUID(); return 'k' + uid + ' -> ' + n1.val + '\nk' + uid + ' [label="*"]'; %}
+  ;
+
+CHAR -> /[A-Za-z0-9]/ ;

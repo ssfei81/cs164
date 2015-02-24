@@ -1,0 +1,17 @@
+def m = 50;
+def n = 100;
+
+def f(){
+print "In f, n = " + n;
+}
+
+def g(n){
+print "In g, m = "+m;
+print "In g, n = "+n;
+f();
+}
+
+print "In main program, n = "+n;
+
+g(1);
+f();

@@ -1,0 +1,116 @@
+%ignore          /[ \t\v\f\r]+/
+%ignore		 	/#.*/
+%ignore 		/\\\n/
+//what else might we want to ignore here?
+
+%left  '||'
+%left '&&'
+%left '==' '!=' '>=' '<=' '>' '<' 'in'
+%left '+' '-' 
+%left '*' '/'
+//what else needs associativity declarations?
+
+%%
+
+//a couple sample lines below.  you might or might not want to use them
+
+Mainp           -> Sep P                                %{ return n2.val %}
+                | P                                     %{ return n1.val %}
+                ;
+ 
+P               -> _                                    %{ return [] %}
+                | S                                     %{ return [n1.val] %}
+                | S2    %dprec 1                        %{ return [n1.val] %}
+                | S2 P  %dprec 2                        %{ return [n1.val].concat(n2.val) %}
+                ;
+ 
+S2              -> S Sep;
+Sep             -> /;/ | /\n/ | /;/ Sep | /\n/ Sep;
+
+
+
+S 		-> E 						%{ return {'body':n1.val, 'type':'exp'} %}
+		| Id '=' E					%{ return {'type':'asgn', 'name':n1.val, 'value':n3.val} %}
+		| E '[' E ']' '=' E			%{ return {'dict':n1.val, 'type':'put','value':n6.val, 'field':n3.val} %}
+		| E '.' Id '=' E			%{ return {'dict':n1.val, 'type':'put','value':n5.val, 'field':{'type':'string-lit', 'value':n3.val.name}} %}
+		| 'print' E					%{ return {'type':'print', 'value':n2.val} %}
+		| 'error' E					%{ return {'message':n2.val, 'type':'error'} %}
+		| 'def' Id '=' E			%{ return {'type':'def', 'name':n2.val, 'value':n4.val} %}
+                | 'def' Id '(' Ids ')' braces           %{ return {'type':'def','name':n2.val,
+                                                                   'value':{'body':n6.val,'type':'lambda','arguments':n4.val}
+                                                                  } %}
+                | 'if' '(' E ')' Sep2 braces Sep2 'else' Sep2 braces %dprec 1     %{return {'true':n6.val, 'false': n10.val,
+                                                                          'type': 'if', 'condition': n3.val} %}
+                | 'if' '(' E ')' Sep2 braces %dprec 2   %{ return {'true': n6.val, 'false': [],
+                                                           'type': 'if', 'condition': n3.val} %}
+		| 'for' '(' Id 'in' E ')' braces	%{ return {'body':n7.val, 'type':'for', 'name':n3.val, 'iterable':n5.val} %}
+		| 'while' '(' E ')' braces		%{ return {'body':n5.val, 'type':'while', 'condition':n3.val} %}
+                ;
+
+braces          ->'{}'                                  %{ return [] %}
+                | '{' Mainp '}'                         %{ return n2.val %};
+ 
+Sep2            -> _ | /\n/;
+
+
+E		-> E_bin	%dprec 2		%{ return n1.val %}
+		|  E_una	%dprec 1		%{ return n1.val %}
+		;
+		
+E_bin   -> E '+' E                  %{ return {'operand1':n1.val, 'type':'+', 'operand2':n3.val} %}
+        |  E '-' E                  %{ return {'operand1':n1.val, 'type':'-',  'operand2':n3.val} %}
+		|  E '*' E	    %{ return {'operand1':n1.val, 'type':'*',  'operand2':n3.val} %}
+		|  E '/' E	    %{ return {'operand1':n1.val, 'type':'/',  'operand2':n3.val} %}
+		|  E '==' E 	    %{ return {'operand1':n1.val, 'type': '==',  'operand2':n3.val} %}
+		|  E '!=' E 	    %{ return {'operand1':n1.val, 'type': '!=', 'operand2':n3.val} %}
+		|  E '>=' E 	    %{ return {'operand1':n1.val, 'type': '>=', 'operand2':n3.val} %}
+		|  E '<=' E 	    %{ return {'operand1':n1.val, 'type': '<=', 'operand2':n3.val} %}
+		|  E '>' E 	    %{ return {'operand1':n1.val, 'type': '>', 'operand2':n3.val} %}
+		|  E '<' E 	    %{ return {'operand1':n1.val, 'type': '<',  'operand2':n3.val} %}
+		|  E '&&' E 	    %{ return {'operand1':n1.val, 'type': '&&', 'operand2':n3.val} %}
+		|  E '||' E 	    %{ return {'operand1':n1.val, 'type': '||',  'operand2':n3.val} %}
+		|  E 'in' E	    %{ return {'operand1':n1.val, 'type': 'in',  'operand2':n3.val} %}
+        ;
+		
+E_una	-> 'null'					%{ return {'type':'null'} %}
+		|  NUM						%{ return n1.val %}
+		|  '-' NUM					%{ n2.val.value = -n2.val.value; return n2.val %}
+		|  Id						%{ return n1.val %}
+		|  String					%{ return n1.val %}
+		|  '{}'						%{ return {'type':'dict-lit', 'value':[] } %}
+		|  'len' '(' E ')'				%{ return {'dict':n3.val, 'type':'len' } %}
+		|  'ite' '(' E ',' E ',' E ')' %{ return {'true':n5.val, 'false':n7.val, 'type': 'ite', 'condition':n3.val} %}
+		|  '(' E ')'				%{ return n2.val %}
+		|  'coroutine' '(' E ')'		%{ return { 'body':n3.val,'type':'coroutine'} %}
+		|  'resume' '(' E ',' E ')'	%{ return {'arg':n5.val, 'type':'resume', 'coroutine':n3.val} %}
+		|  'yield' '(' E ')'			%{ return {'type':'yield', 'arg':n3.val} %}
+		|  'lambda' '(' Ids ')' braces  %{ return {'body': n5.val,'type': 'lambda', 'arguments': n3.val } %}
+		|  E '(' Es ')'		     %{ return {'function': n1.val, 'type': 'call', 'arguments': n3.val} %}
+		| E ':' Id '(' Es ')'	     %{ return {'obj': n1.val, 'args': n5.val, 'type': 'mcall', 'mname': n3.val} %}
+		|  '{' KVpairs '}'              %{ return {'type': 'dict-lit', 'value': n2.val } %}
+		|	'[' E 'for' Id 'in' E ']' %{ return {'expression':n2.val, 'type':'comprehension', 'name':n4.val, 'iterable':n6.val} %}
+		|  E '[' E ']'	    %{ return {'dict':n1.val, 'type':'get', 'field':n3.val} %}
+		|  E '.' Id	    %{ return {'dict':n1.val, 'type':'get', 'field':{'type':'string-lit', 'value':n3.val.name}} %}
+	;
+
+KVpairs         -> KVpair ',' KVpairs           %{ return [n1.val].concat(n3.val) %}
+                |  KVpair                       %{ return [n1.val] %}
+		;
+KVpair          -> Id '=' E                     %{ return {'name': n1.val.name, 'value': n3.val} %}
+                ;
+		
+Ids             -> _                                    %{return [] %}
+                | Ids2                                  %{return n1.val %};
+Ids2            ->  Id                                  %{return [n1.val] %}
+                | Id ',' Ids2                           %{return [n1.val].concat(n3.val) %}
+                ;
+
+Es		-> _ 					%{return [] %}
+		| Es2					%{return n1.val %};
+
+Es2		-> E					%{return [n1.val] %}
+		| E ',' Es2				%{return [n1.val].concat(n3.val) %};
+
+NUM		-> /[0-9]+/					%{ return {'type':'int-lit', 'value':parseInt(n1.val)} %};
+Id		-> /[a-zA-Z_][a-zA-Z_0-9]*/ %{ return {'type':'id', 'name':n1.val} %};
+String	-> /"[^"]*"|'[^']*'/		%{ return {'type':'string-lit', 'value':n1.val.substring(1, n1.val.length-1)} %};

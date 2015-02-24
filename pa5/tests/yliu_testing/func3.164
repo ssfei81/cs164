@@ -1,0 +1,8 @@
+def f(a) {
+  while(a < 10) {
+    a = a + 1
+    a
+  }
+}
+
+print f(7)

@@ -1,0 +1,45 @@
+def newList() {
+	def length = 0
+	def list = "|"
+	def append(item) {
+	  list = list + item + "|"
+	  length = length + 1 
+	}
+	def to_s() {
+	  list
+	}
+	def clear() {
+	  list = "|"
+	  length = 0
+	}
+	lambda(func) {
+	  if(func == "to_s") {
+	    to_s()
+	  } else {
+	    if(func == "append") {
+	      lambda(item) {
+	        append(item)
+	      }   
+	    } else {
+	      if(func == "length") {
+	        length
+	      } else {
+	        if(func == "clear") {
+	          clear()
+	        }
+	      }
+	    }
+	  }
+	}
+}
+
+def list = newList()
+list("append")(4)
+list("append")("f")
+list("append")("foo")
+list("append")("Getting to 35 points is a huge f&#*ing challenge!")
+print list("to_s")
+print "My list has " + list("length") + ' items in it!'
+list("clear")
+print list("to_s")
+print "My list has " + list("length") + ' items in it!'

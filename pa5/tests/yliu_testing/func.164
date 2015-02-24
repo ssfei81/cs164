@@ -1,0 +1,12 @@
+def foo = lambda() {"hello"}
+def bar = lambda(x) {}
+def f = lambda() { 
+	def x = 2
+	foo = lambda() {x}
+	bar = lambda(y) { x = y}
+}
+print foo()
+f()
+print x
+print foo()
+print bar(100)

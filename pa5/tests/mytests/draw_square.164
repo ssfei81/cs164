@@ -1,0 +1,42 @@
+def draw_square(width, thickness){
+def x = width;
+def y = width;
+def tmp = 0;
+def line = "";
+while  (x > 0){
+
+    y = width;
+    line = "";
+    while(y > 0){
+	if (y <= thickness ){
+	    line = line+"*  ";
+            }
+	else{
+	    if (y > width - thickness ){
+	        line = line + "*  ";
+	        }
+	    else{
+		 if (x > width - thickness ){
+	       	      line = line+"*  ";
+	             }
+		 else{
+		     if (x <= thickness){
+	        	 line = line+"*  ";
+	                 }
+		    else{
+		        line = line + "   ";
+			}
+		    }
+
+		}
+	    }
+	y=y-1;
+	}
+    print line
+    x=x-1;
+    }
+print "";
+}
+
+draw_square(10, 2);
+draw_square(15, 3);

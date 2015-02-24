@@ -1,0 +1,4 @@
+for (x in null) {
+	print "you never should have come here"
+}
+print "done"

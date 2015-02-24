@@ -1,0 +1,60 @@
+def a = 2
+def b = 5
+def c = 7
+
+def FScope = lambda() {
+	print "unmodified by f"
+	print a
+	print b
+	print c
+	print "modified by Fscope:"
+	def a = a + 1
+	def b = b + 1
+	def c = c + 1
+	print a
+	print b
+	print c
+	print " "
+}
+def HScope = lambda() {}
+def GScope = lambda () {
+	print "unmodified by G"
+	print a
+	print b
+	print c
+	
+	print "modified by GScope"
+	def a = a + 2
+	def b = b + 2
+	def c = c + 2
+	
+	print a
+	print b
+	print c
+	
+	HScope = lambda () {
+		print "Creating HScope inside GScope"
+		print "Unmodified by H"
+		print a
+		print b
+		print c
+		
+		def a = a + 3
+		def b = b + 3
+		def c = c + 3
+		
+		print "modified by HScope"
+		print a
+		print b
+		print c
+	}
+	
+	
+	
+	
+}
+
+
+FScope()
+GScope()
+HScope()

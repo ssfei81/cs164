@@ -1,0 +1,36 @@
+##
+# VBox: A box that stacks its children vertically.
+#
+
+def VBox = Box:new({})
+VBox.new = lambda(self, obj){
+obj = Box.new(self, obj);
+obj.children={}
+obj
+}
+
+VBox.pass2 = lambda(self) {
+  # TODO: What should be computed in this pass?
+  # give this pass a more informative name, and complete all necessary
+  # computation
+  def t = 0;
+  def childHeights = 0
+  for (child in self.children){
+	child.height = child.weight * self.height / self.weight
+	childHeights = childHeights + child.height
+	child.width = self.width
+	child.maxOpacityValue = self.maxOpacityValue
+	child.x = self.x
+	}
+  if (len(self.children) != 0) {
+	def exP = self.height - childHeights
+	for (child in self.children) {
+		if (exP > 0) {
+			child.height = child.height + 1
+			exP = exP - 1
+		}
+		child.y = self.y + t
+		t = t + child.height
+	}
+  }
+}

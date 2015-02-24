@@ -1,0 +1,34 @@
+##
+# HBox: A box that lays out its children horizontally
+#
+def HBox = Box:new({})
+HBox.new = lambda(self, obj){
+obj = Box.new(self,obj);
+obj.children={}
+obj
+}
+
+HBox.pass2 = lambda(self) {
+  # TODO: What should be computed in this pass?
+  # give this pass a more informative name, and complete all necessary
+def t = 0
+def childWidths = 0
+for(child in self.children){
+	child.height = self.height
+	child.width = child.weight * self.width / self.weight
+	childWidths = childWidths + child.width
+	child.maxOpacityValue = self.maxOpacityValue;
+	child.y = self.y
+	}
+if (len(self.children) != 0) {
+	def exP = self.width - childWidths
+	for (child in self.children) {
+		if (exP > 0) {
+			child.width = child.width + 1
+			exP = exP - 1
+		}
+		child.x = self.x + t
+		t = t + child.width
+	}
+  }
+}

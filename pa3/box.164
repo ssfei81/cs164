@@ -1,0 +1,73 @@
+#
+#
+# Box: The superclass of VBox and HBox, both of which share how
+# they're rendered and traversed
+#
+def Box = Object:new({ \
+  x=0, y=0, width=0, height=0, color="black", weight = 0, weight2 = 0, opacityValue = 0, maxOpacityValue = 0, text="" \
+})
+
+##
+# Box instances each have their own list of children.
+#
+Box.new = lambda(self, obj) {
+  obj = Object.new(self, obj)
+  if (not("children" in obj)) { obj.children = {} }
+  obj
+}
+
+Box.visitInPreorder = lambda(self,f) {
+  # TODO: implement me!
+  f(self);
+  for(child in self.children){
+	  child:visitInPreorder(f);
+	}
+}
+
+Box.visitInPostorder = lambda(self,f) {
+  # TODO: implement me!
+  for(child in self.children){
+	child:visitInPostorder(f);
+	}
+  f(self);
+}
+
+Box.addChild = lambda(self, child) {
+  append(self.children, child)
+  child.parent = self
+  self
+}
+
+def abs(n){
+if(n<0) {0-n}
+else {n}
+}
+
+Box.pass1_ComputeWeightAndColor = lambda(self) {
+  # TODO: implement me!
+  # Right now, this pass only propogates weight.  What else
+  # should it do?
+
+  for (child in self.children) {
+    self.weight = self.weight + child.weight
+    self.maxOpacityValue = max(abs(child.weight2), self.maxOpacityValue);
+    self.maxOpacityValue = max(child.maxOpacityValue, self.maxOpacityValue);
+    self.maxOpactiyValue = max(abs(self.weight2), self.maxOpacityValue);
+  }
+    if(self.weight2 < 0){
+	  self.color="red"
+	} else{
+	  self.color="green"
+	}
+
+}
+
+Box.pass3_Render = lambda(self) {
+  # TODO: implement me!
+  #print self.text+" x: "+self.x+" y: "+self.y+" width: "+self.width+" height: "+self.height+" weight: "+self.weight+ " weight2:" +self.weight2+" color: "+self.color
+#  print self.text+"  "+self.maxOpacityValue+" "+self.weight2
+  js drawBox(self.x, self.y, self.width, self.height, self.color, abs(self.weight2), self.maxOpacityValue, self.text);
+  if(len(self.children)==0 && self.height > 10){
+    js drawText(self.x ,self.y + self.height, self.text, 10);
+  }
+}

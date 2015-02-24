@@ -1,0 +1,19 @@
+def ryan(a,b,c) {
+  print a
+  print b
+  if(c == 0) {
+    print "Base case!"
+    def ryan(b) {
+      def c = 0
+      print "It's over..."
+      print a + b + c
+    }
+    a = 9000
+    c = -9000
+    ryan(0)
+  } else {
+    ryan(b, a, c-1)
+  }
+}
+
+ryan(2112,1337,2)

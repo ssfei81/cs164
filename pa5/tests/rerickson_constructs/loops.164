@@ -1,0 +1,27 @@
+def range(n) {
+    def i = 0
+    lambda () {
+        if (i < n) {
+            i = i + 1
+            i 
+        } else {
+            null    
+        }
+    } 
+}
+
+def y = 1
+def t = 1
+for(x in range(2)) {
+  y = 1
+  while(y <= 2) {
+    for(z in range(2)) {
+      t = 1
+      while(t <= 2) {
+        print x*y*z*t
+        t = t + 1      
+      }
+    }
+    y = y + 1
+  }
+}

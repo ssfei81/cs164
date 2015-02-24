@@ -1,0 +1,25 @@
+(lambda(){
+  (lambda(x,y) {
+    print lambda(foo,bar){} == 2
+    print x + y
+  })(3, 4)
+  (lambda(){
+    lambda() {
+      lambda() {
+        lambda() {
+          lambda() {
+            lambda() {
+              print 'Lambdaception'
+            }
+          }
+        } 
+      }
+    }
+  })()()()()()()
+  (lambda(a, b, c, d) {
+    print a(d)
+    print b(c)
+    print c(b)
+    print d(a)
+  })(lambda(a){print a}, lambda(b){print b}, lambda(c){print c}, lambda(d){print d})
+})()

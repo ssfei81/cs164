@@ -1,0 +1,48 @@
+def a = "I wanna be the very best"
+def b = "Actually I give up, Gary is better than I'll ever be!"
+def c = "I mean, what was I thinking?"
+def d = "Traveling the world at 10..."
+def e = "I could have been murdered!"
+def f = "I have a terrible mother..."
+def g = "I don't want to adventure the world for a billion seasons after all."
+def h = "Pikachu? What the hell's a pikachu?"
+def one(b) {
+  def two(c, d) {
+    def three(g) {
+      def h = "The power that's inside"
+      def four() {
+	def f = "Searching far and wide"
+	def five() {
+	  def e = "I will travel across the land"
+	  def six() {
+	    def eight() {
+	      print a
+	      print b
+	      print c
+	      print d
+	      print e
+	      print f
+	      print g
+	      print h
+	    }
+	    def g = "Each Pokemon to understand"
+	    def seven() {
+	      def h = "Team Rocket is blasting off again"
+	      def a = "I want to be the very worst"
+	      eight()
+	    }
+	    def h = "The power that's inside"
+	    seven()
+	  }
+	  six()
+	}
+	five()
+      }
+      four()
+    }
+    three("Digimon, digital monsters, digimon are the champions!")
+  }
+  two("To catch them is my real test", "To train them is my cause")
+}
+one("Like no one ever was")
+

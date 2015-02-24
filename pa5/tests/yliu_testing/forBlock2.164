@@ -1,0 +1,16 @@
+def iter(max) {
+    def i = 0
+    lambda () {
+        if (i < max) {
+            i = i + 1
+            i 
+        } else {
+            null    
+        }
+    } 
+}
+def x = 0
+for (x in iter(10)) {     
+    print x 
+}
+print x

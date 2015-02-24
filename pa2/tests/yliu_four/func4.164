@@ -1,0 +1,9 @@
+def f = lambda(x) {
+	lambda(y) {
+		lambda(z) {
+			x + y + z
+		}
+	}
+
+}
+print f(10)(20)(30)

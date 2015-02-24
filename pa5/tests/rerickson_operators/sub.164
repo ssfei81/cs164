@@ -1,0 +1,5 @@
+print 1 - 9
+print -1 - 4
+print -10 - (-5)
+print 200 - 36
+print 75 - 75

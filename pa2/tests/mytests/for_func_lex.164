@@ -1,0 +1,33 @@
+def iter(max) {
+    def i = 0
+    lambda () {
+        if (i < max) {
+            i = i + 1
+            i 
+        } else {
+            null    
+        }
+    } 
+}
+def i = 1000
+def set = lambda(x) {}
+def iter2(max) {
+    def i = 0
+	set = lambda(x) {i = x}
+    lambda () {
+        if (i < max) {
+            i = i + 1
+            i 
+        } else {
+            null    
+        }
+    } 
+}
+for (x in iter(5)) {
+	for (y in iter2(5)) {
+		print x * y
+	}
+	set(0)
+}
+set(0)
+print i

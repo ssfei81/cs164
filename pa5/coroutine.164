@@ -1,0 +1,36 @@
+def feedCo(){
+    def sc=sourceCo()
+    print"Created source coroutine."
+    process(sc)
+}
+
+def process(sc){
+    
+    def processCoFun(unused){
+        
+        def x1=resume(sc,null)
+        print"Running process coroutine."
+        yield("First:"+x1)
+        def x2=resume(sc,null)
+        yield("Second:"+x2)
+        def x3=resume(sc,null)
+        print"Finishing process coroutine."
+    }
+    coroutine(processCoFun)
+}
+
+def sourceCo(){
+    def sourceCoFun(unused){
+        yield(1)
+        print"Running source coroutine."
+        yield(2)
+    }
+    coroutine(sourceCoFun)
+}
+
+def fc=feedCo()
+def r1=resume(fc,null)
+def r2=resume(fc,null)
+def r3=resume(fc,null)
+
+print "End."

@@ -1,0 +1,7 @@
+def f() {
+  def g() {
+    def x = 4
+  }
+  print x
+}
+f()

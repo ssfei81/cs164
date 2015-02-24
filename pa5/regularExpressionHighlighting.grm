@@ -1,0 +1,12 @@
+%ignore /\n+/
+
+%%
+
+R ->  CHAR               %{ return n1.val; %}
+  | R R        %dprec 2  %{ return n1.val+n2.val; %}
+  | R '|' R    %dprec 3  %{ var uid1 = genUID(); var uid2 = genUID(); return '<span class="'+uid1+'">'+n1.val+'</span><span class="'+uid2+'">|</span><span class="'+uid1+'">'+n3.val+'</span><script>$(".'+uid2+'").hover(function() { $(".'+uid1+'").css("background", "yellow"); }, function() { $(".'+uid1+'").css("background", ""); });</script>'; %}
+  | '(' R ')'            %{ var uid1 = genUID(); return '<span class="'+uid1+'">(</span>'+n2.val+'<span class="'+uid1+'">)</span><script>$(".'+uid1+'").hover(function() { $(".'+uid1+'").css("background", "lightgreen"); }, function() { $(".'+uid1+'").css("background", ""); });</script>' %}
+  | R '*'	   %dprec 1	 %{ var uid1 = genUID(); var uid2 = genUID(); return '<span class="'+uid1+'">'+n1.val+'</span><span class="'+uid2+'">*</span><script>$(".'+uid2+'").hover(function() { $(".'+uid1+'").css("background", "cyan"); }, function(){$(".'+uid1+'").css("background", "");}); </script>'  %}
+  ;
+
+CHAR -> /[A-Za-z0-9]/ ;

@@ -1,0 +1,13 @@
+def x = 1
+if (x) {
+	def x = 0
+	print "true"
+	if (x) {
+		print "twice true"
+	} else {
+		print "not true anymore"
+	}
+} else {
+	print "false"
+}
+print x

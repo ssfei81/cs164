@@ -1,0 +1,60 @@
+def me = 'not Ryan'
+lambda() {
+	print (3 + 4/3*16 - 12 + 12*12*12 - 13*16 + 144)*(164 + 170 - (3 + (2 + (3*98))))
+	print 1+2-3/4*5-6+7*8*9-10+11+12+13+14/15*16-17*18*19-20
+	print 3 == 3 > 6 < 9 <= 14 >= 1 != 6 > 9 < 2 > 1 < 4 > 12 == 0 
+	print 4 > 3 == 2 == 1 != 0 != 9 == 8 == 2 + 3 * 5 / 9 * 14 == 14 != 22
+
+	def foo = "foo"
+	def bar = 'bar'
+	def baz = 'baz'
+	print foo + ' ' + bar + ' ' + baz + ' ' + 'qux'
+
+	print lambda(){} == lambda(){}
+	def l1 = lambda(){}
+	def l2 = l1
+	print l1 == l2
+	l2 = 'lambda'
+	print l1 == l2
+	def leppard() {
+	  def qux = "foo"
+	  foo = bar
+	  bar = baz
+	  baz = qux
+	  pourSomeSugarOn(me)
+	}
+	def pourSomeSugarOn(me) {
+	  def i = "me mine"
+	  def leppard = lambda() {
+	    i = 0
+	  }
+	  leppard()
+	  if(me == "Ryan") {
+	    while(i < 10) {
+	      print 10 - i
+	      i = i+1
+	    }	  
+	  }	else {
+	    if(me == "derpaderpq") {
+	      def team = lambda() {
+	        def i = -1
+	        lambda() {
+	          i = i + 1
+	          ite(i == 0, 't', ite(i == 1, 'e', ite(i == 2, 'a', ite(i == 3, 'm', null))))
+	        }
+	      }
+	      for(i in team()) {
+	        print i
+	      }
+	    } else { print 'in the name of love' }
+	  }
+	}
+	def me = 'Ryan'
+	leppard()
+	print foo + bar + baz
+	me = "derpaderpq"
+	leppard()
+	me = "someone else"
+	leppard()
+	print foo + bar + baz
+}()

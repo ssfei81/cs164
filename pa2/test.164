@@ -1,0 +1,17 @@
+    def i = 0
+    def lan () {
+        if (i < 10) {
+            i = i + 1
+            i 
+        } else {
+            null    
+        }
+    } 
+def x = lan
+for (u in lan) {
+    if(u == 1){     
+    x = lambda(){u}
+    } 
+}
+
+print x()
